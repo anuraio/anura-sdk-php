@@ -64,7 +64,7 @@ if ($result) {
     // $result->isMobile();
 
     // $anuraResult = $result->result;
-    // $visitorWasMobile = result->mobile;
+    // $visitorWasMobile = $result->mobile;
     // $ruleSets = $result->ruleSets;
     // $invalidTrafficType = $result->invalidTrafficType;
 
