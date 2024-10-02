@@ -1,0 +1,20 @@
+{
+    "name": "anura/anura-sdk-php",
+    "description": "Anura SDK for PHP.",
+    "version": "1.0.0",
+    "type": "library",
+    "require": {
+        "php": ">=7.4",
+        "guzzlehttp/guzzle": "^7.9"
+    },
+    "autoload": {
+        "psr-4": {
+            "Anura\\": "src/Anura/"
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^11.3"
+    },
+    "config": {
+    }
+}
