@@ -4,11 +4,23 @@ The **Anura SDK for PHP** makes it easy for developers to access Anura Direct wi
 ## Getting Started
 1. **Have an open active account with Anura** - You can see more about Anura's offerings [here.](https://www.anura.io/product#plans-pricing)
 2. **Minimum Requirements** - To use the SDK, you will need **PHP >=7.4**.
+- If you're looking to install the SDK *without* Composer, see the [**Alternative Installation Methods**](#alternative-installation-methods) section below.
 3. **Install the SDK** - Using [Composer](https://getcomposer.org/) is the easiest and recommended way to install it. The SDK is available on Packagist. If Composer is installed globally on your system, you can run the following command in the base directory of your project to add the SDK as a dependency:
 ```
 composer require anura/anura-sdk-php
 ```
-4. **Using the SDK** - The best way to start getting familiar with the SDK is to have a look at our **Quick Examples** section which covers the most common use-cases for it.
+4. **Using the SDK** - The best way to start getting familiar with the SDK is to have a look at our [**Quick Examples**](#quick-examples) section which covers the most common use-cases for it.
+
+## Alternative Installation Methods
+### Installing via PHAR
+1. Download the PHAR from our latest release, and place it within your project.
+2. Require or include the `anura-sdk-php.phar` file within your project.
+3. You're good to go!
+
+### Installing via ZIP Archive
+1. Download `anura-sdk-php.zip` from our latest release, extract it, and place `anura-sdk-php/` within your project.
+2. Require or include our autoloader at `anura-sdk-php/autoload.php`
+3. You're good to go!
 
 ## Quick Examples
 
@@ -16,6 +28,12 @@ composer require anura/anura-sdk-php
 ```php
 // Require the Composer autoloader.
 require 'vendor/autoload.php';
+
+// Or if you're using the PHAR, require/include that.
+require '/path/to/anura-sdk-php.phar';
+
+// Or if you're using the ZIP archive, require/include its autoloader.
+require '/path/to/anura-sdk-php/autoload.php';
 
 use Anura\AnuraDirect;
 use Anura\DirectResult;
