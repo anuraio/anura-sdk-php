@@ -126,13 +126,13 @@ Parameters:
 **`getAdditionalData(): array`**
 - Returns the addtional data you have set within the **`AnuraDirect`** client.
 
-**`setInstance(string $instance): string`**
+**`setInstance(string $instance): void`**
 - Sets the instance ID of the **`AnuraDirect`** client to the `$instance` value passed.
 
-**`setSource(string $source): string`**
+**`setSource(string $source): void`**
 - Sets the source of the **`AnuraDirect`** client to the `$source` value passed.
 
-**`setCampaign(string $campaign): string`**
+**`setCampaign(string $campaign): void`**
 - Sets the campaign of the **`AnuraDirect`** client to the `$campaign` value passed.
 
 **`addAdditionalData(string $key, string $value): void`**
