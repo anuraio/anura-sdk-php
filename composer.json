@@ -1,7 +1,7 @@
 {
     "name": "anura/anura-sdk-php",
     "description": "Anura SDK for PHP.",
-    "version": "0.1.0",
+    "version": "1.0.0",
     "type": "library",
     "license": "GPL-3.0-only",
     "require": {
