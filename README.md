@@ -36,62 +36,87 @@ require '/path/to/anura-sdk-php.phar';
 require '/path/to/anura-sdk-php/autoload.php';
 
 use Anura\AnuraDirect;
+use Anura\DirectRequestBuilder;
+use Anura\DirectRequest;
+use Anura\AdditionalData;
 use Anura\DirectResult;
+use Anura\Exception\AnuraClientException;
+use Anura\Exception\AnuraServerException;
 
 // Instantiate an Anura Direct client.
 $direct = new AnuraDirect('your-instance-id-goes-here');
 ```
-### Set a custom source, campaign, and additional data for Anura Direct
-```php
-$direct->setSource('your-source-value');
-$direct->setCampaign('your-campaign-value');
-$direct->addAdditionalData('1', 'your-data-value');
-```
 
-### Updating additional data at a specific index
+### Set additional data for Anura Direct
 ```php
 /**
- * To update an element of additional data at a specific index, 
- * simply add the element again but with a new value.
+ * To send additional data to Anura Direct, use the AdditionalData class.
+ * We will provide this object when calling $direct->getResult()
  */
-$indexToUpdate = '1';
-$direct->addAdditionalData($indexToUpdate, 'your-new-data-value');
+$additionalData = new AdditionalData();
+$additionalData->addElement(1, 'your-data-value');
 ```
 
-### Removing an element from additional data
+### Updating elements of additional data
 ```php
-$indexToRemove = '1';
-$direct->removeAdditionalData($indexToRemove);
+/**
+ * To update an element of additional data, 
+ * simply add the element again but with a new value
+ */
+$indexToUpdate = 1;
+$additionalData->addElement($indexToUpdate, 'your-new-data-value');
+```
+
+### Removing an element of additional data
+```php
+$indexToRemove = 1;
+$additionalData->removeElement($indexToRemove);
+```
+
+### Create a DirectRequest object for AnuraDirect client
+```php
+$builder = new DirectRequestBuilder();
+$request = $builder
+                ->setIpAddress('visitors-ip-address')   // required
+                ->setSource('your-source-value')        // optional
+                ->setCampaign('your-campaign-value')    // optional
+                ->setUserAgent('visitors-user-agent')   // optional
+                ->setApp('visitors-app-id')             // optional
+                ->setDevice('visitors-device-id')       // optional
+                ->setAdditionalData($additionalData)    // optional
+                ->build();
 ```
 
 ### Get a result from Anura Direct
 ```php
-$result = $direct->getResult(
-    'visitors-ip-address',
-    'visitors-user-agent', // optional
-    'visitors-app-package-id', // optional
-    'visitors-device-id' // optional
-);
-
-if ($result) {
-    // We got a result (a DirectResult object)! 
-    // See below for available properties & DirectResult objects.
-
-    // $result->isSuspect();
-    // $result->isNonSuspect();
-    // $result->isMobile();
-
-    // $anuraResult = $result->result;
-    // $visitorWasMobile = $result->mobile;
-    // $ruleSets = $result->ruleSets;
-    // $invalidTrafficType = $result->invalidTrafficType;
-
-} else {
-    // An error occurred. Can retrieve the error message using getError().
-    $error = $direct->getError();
-
-    // Error handling logic goes here.
+try {
+    $result = $direct->getResult($request);
+} catch (AnuraClientException $e) {
+    // Handle 4XX responses here.
+} catch (AnuraServerException $e) {
+    // Handle 5XX responses here.
+} catch (AnuraException $e) {
+    /**
+     * Handle any other exceptions that may have occurred.
+     * Since AnuraClientException & AnuraServerException are children of AnuraException, 
+     * feel free to remove those handling blocks if your handling logic is the same for both.
+     */
 }
+
+// We got a result (a DirectResult object)! 
+// See below for available properties & DirectResult objects.
+
+// $result->isSuspect();
+// $result->isNonSuspect();
+// $result->isMobile();
+
+// $anuraResult = $result->result;
+// $visitorWasMobile = $result->mobile;
+// $ruleSets = $result->ruleSets;
+// $invalidTrafficType = $result->invalidTrafficType;
+
+echo "result: $result";
+
 ```
 
 ## API Reference
@@ -99,49 +124,107 @@ if ($result) {
 Can get results from Anura Direct. These results are fetched using Direct's `/direct.json` API endpoint.
 
 #### Methods
-**`getResult(): ?DirectResult`**
-- Gets a result from Anura Direct. Returns `null` if an error was received from Anura Direct. The error can be recieved by calling `getError()`.
-
-Parameters:
-
-| Name | Type | Description | Required |
-| ---- | ---- | ----------- | -------- |
-| `$ipAddress` | `string` | The IP address of your visitor. Both IPv4 & IPv6 addresses are supported. | Yes |
-| `$userAgent` | `string` | The user agent string of your visitor | |
-| `$app` | `string` | The application package identifier of your visitor (when available.) | |
-| `$device` | `string` | The device identifier of your visitor (when available.) | |
-  
-**`getError(): ?string`**
-- Returns the last received error from Anura Direct. Returns null if an error has not occurred.
+**`getResult(DirectRequest $request): DirectResult`**
+- Gets a result from Anura Direct.
+- Exceptions thrown:
+    - `AnuraClientException`: If a 4XX response is returned from Anura Direct.
+    - `AnuraServerException`: If a 5XX response is returned from Anura Direct.
+    - `AnuraException`: Base exception for the Anura SDK. Used for any unexpected exceptions caused when using the Anura SDK. Can also be used as a general catch-all exception for simpler error handling.
 
 **`getInstance(): string`**
 - Returns the instance you have set within the **`AnuraDirect`** client.
 
-**`getSource(): string`**
-- Returns the source you have set within the **`AnuraDirect`** client.
-
-**`getCampaign(): string`**
-- Returns the source you have set within the **`AnuraDirect`** client.
-
-**`getAdditionalData(): array`**
-- Returns the addtional data you have set within the **`AnuraDirect`** client.
-
 **`setInstance(string $instance): void`**
-- Sets the instance ID of the **`AnuraDirect`** client to the `$instance` value passed.
+- Sets the instance of the **`AnuraDirect`** client to the `$instance` value passed.
+
+### AdditionalData
+A class representing Additional Data for Anura Direct. 
+
+**`addElement(int $key, string $value): void`**
+- Adds an element of data to your additional data.
+- If you call `addElement()` multiple times with the same `$key`, the element at `$key` will simply be updated with the new `$value`.
+
+**`removeElement(int $key): void`**
+- Removes the element of additional data located at `$key`.
+- Nothing will occur if you do not have a value stored at `$key`.
+
+**`size(): int`**
+- Returns the number of elements currently set within your additional data.
+
+**`__toString(): string`**
+- Returns your additional data as a JSON string.
+
+### DirectRequestBuilder
+A builder class for creating a `DirectRequest`.
+
+**`build(): DirectRequest`**
+- Builds and returns the `DirectRequest` as configured.
+
+**`setSource(string $source): DirectRequestBuilder`**
+- Sets the source for the `DirectRequest` to be built.
+
+**`setCampaign(string $campaign): DirectRequestBuilder`**
+- Sets the campaign for the `DirectRequest` to be built.
+
+**`setIpAddress(string $ipAddress): DirectRequestBuilder`**
+- Sets the IP address for the `DirectRequest` to be built. Both IPv4 and IPv6 addresses are supported.
+
+**`setUserAgent(string $userAgent): DirectRequestBuilder`**
+- Sets the user agent for the `DirectRequest` to be built.
+
+**`setApp(string $app): DirectRequestBuilder`**
+- Sets the application package identifier for the `DirectRequest` to be built.
+
+**`setDevice(string $device): DirectRequestBuilder`**
+- Sets the device identifier for the `DirectRequest` to be built.
+
+**`setAdditionalData(AdditionalData $additionalData): DirectRequestBuilder`**
+- Sets the additional data for the `DirectRequest` to be built.
+
+### DirectRequest
+An object that represents an Anura Direct API request.
+
+**`getSource(): ?string`**
+- Returns the source set within the `DirectRequest` instance.
 
 **`setSource(string $source): void`**
-- Sets the source of the **`AnuraDirect`** client to the `$source` value passed.
+- Sets the source of the `DirectRequest` instance to the `$source` value passed.
+
+**`getCampaign(): ?string`**
+- Returns the campaign set within the `DirectRequest` instance.
 
 **`setCampaign(string $campaign): void`**
-- Sets the campaign of the **`AnuraDirect`** client to the `$campaign` value passed.
+- Sets the campaign of the `DirectRequest` instance to the `$campaign` value passed.
 
-**`addAdditionalData(string $key, string $value): void`**
-- Adds an element of additional data to be sent to Anura Direct. 
-- If you call `addAdditionalData()` multiple times with the same `$key`, the element at `$key` will simply be updated with the new `$value`.
+**`getIpAddress(): string`**
+- Returns the IP address set within the `DirectRequest` instance.
 
-**`removeAdditionalData(string $key): void`**
-- Removes an element of your additional data array which will be sent to Anura Direct.
-- Nothing will occur if you do not have a value stored at `$key`.
+**`setIpAddress(string $ipAddress): void`**
+- Sets the campaign of the `DirectRequest` instance to the `$ipAddress` value passed.
+
+**`getUserAgent(): ?string`**
+- Returns the user agent set within the `DirectRequest` instance.
+
+**`setUserAgent(string $userAgent): void`**
+- Sets the user agent of the `DirectRequest` instance to the `$userAgent` value passed.
+
+**`getApp(): ?string`**
+- Returns the application package identifier set within the `DirectRequest` instance.
+
+**`setApp(string $app): void`**
+- Sets the application package identifier of the `DirectRequest` instance to the `$app` value passed.
+
+**`getDevice(): ?string`**
+- Returns the device identifier set within the `DirectRequest` instance.
+
+**`setDevice(string $device): void`**
+- Sets the device identifier of the `DirectRequest` instance to the `$device` value passed.
+
+**`getAdditionalData(): ?AdditionalData`**
+- Returns the additional data set within the `DirectRequest` instance.
+
+**`setAdditionalData(AdditionalData $additionalData): void`**
+- Sets the additional data of the `DirectRequest` instance to the `$additionalData` passed.
 
 ### DirectResult
 The result upon a successful call to `getResult()` from the **`AnuraDirect`** client. It contains not only the result from Anura Direct, but some other methods to help you use the result.
@@ -156,14 +239,13 @@ The result upon a successful call to `getResult()` from the **`AnuraDirect`** cl
 **`isMobile(): bool`**
 - Returns whether or not the visitor has been determined to be on a mobile device.
 
-#### Properties
-**`result: string`**
+**`getResult(): string`**
 - Besides using our `isSuspect()` or `isNonSuspect()` methods, you are also able to access the result value.
 
-**`ruleSets: ?array`**
+**`getRuleSets(): ?array`**
 - If you have **return rule sets** enabled, you will be able to see which specific rules were violated upon a **suspect** result. This value will be null if the visitor is **non-suspect**, or if you do not have **return rule sets** enabled.
 - You can talk to [support](mailto:support@anura.io) about enabling or disabling the return rule sets feature.
- 
-**`invalidTrafficType: ?string`**
+
+**`getInvalidTrafficType: ?string`**
 - If you have **return invalid traffic type** enabled, you will be able to access which type of invalid traffic occurred upon a **suspect** result.
 - You can talk to [support](mailto:support@anura.io) about enabling or disabling the return invalid traffic type feature.
