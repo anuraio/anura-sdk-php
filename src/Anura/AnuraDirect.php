@@ -8,8 +8,8 @@ use GuzzleHttp\Client;
 use Exception;
 use Anura\DirectResult;
 use Anura\DirectRequest;
-use Anura\Exceptions\AnuraClientException;
-use Anura\Exceptions\AnuraException;
+use Anura\Exception\AnuraClientException;
+use Anura\Exception\AnuraException;
 
 /**
  * API client for Anura Direct.
