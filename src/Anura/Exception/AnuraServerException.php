@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
-namespace Anura\Exceptions;
+namespace Anura\Exception;
 
 /**
- * Base exception class for Anura SDK.
+ * Thrown when a 5XX response is returned from the Anura Direct API.
  */
-class AnuraException extends \Exception
+class AnuraServerException extends AnuraException
 {
     public function __construct($message, $code = 0, \Throwable $previous = null)
     {

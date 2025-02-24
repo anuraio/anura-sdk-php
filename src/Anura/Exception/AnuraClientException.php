@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace Anura\Exceptions;
+namespace Anura\Exception;
 
 /**
  * Thrown when a 4XX response is returned from the Anura Direct API.
