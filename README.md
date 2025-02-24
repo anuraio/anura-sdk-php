@@ -40,6 +40,7 @@ use Anura\DirectRequestBuilder;
 use Anura\DirectRequest;
 use Anura\AdditionalData;
 use Anura\DirectResult;
+use Anura\Excepion\AnuraException;
 use Anura\Exception\AnuraClientException;
 use Anura\Exception\AnuraServerException;
 
