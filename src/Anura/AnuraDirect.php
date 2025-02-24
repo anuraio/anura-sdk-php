@@ -8,8 +8,9 @@ use GuzzleHttp\Client;
 use Exception;
 use Anura\DirectResult;
 use Anura\DirectRequest;
-use Anura\Exception\AnuraClientException;
 use Anura\Exception\AnuraException;
+use Anura\Exception\AnuraClientException;
+use Anura\Exception\AnuraServerException;
 
 /**
  * API client for Anura Direct.
@@ -62,7 +63,7 @@ class AnuraDirect
         } catch(ServerException $e) {
             $body = json_decode($e->getResponse()->getBody()->getContents(), true);
             $error = $body['error'] ?? 'Anura Server-Side Error: ' . $e->getResponse()->getStatusCode();
-            throw new AnuraClientException($error);
+            throw new AnuraServerException($error);
         } catch (Exception $e) {
             throw new AnuraException($e->getMessage());
         }
