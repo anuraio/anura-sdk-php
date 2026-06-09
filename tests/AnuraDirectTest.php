@@ -1,10 +1,10 @@
-<?php 
+<?php
 declare(strict_types = 1);
 
 use PHPUnit\Framework\TestCase;
 use Anura\AnuraDirect;
 use Anura\DirectRequestBuilder;
-use Anura\Exceptions\AnuraClientException;
+use Anura\Exception\AnuraClientException;
 
 final class AnuraDirectTest extends TestCase
 {
